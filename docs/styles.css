@@ -7,7 +7,7 @@ body{
     font-family:  'Times New Roman', Times, serif;
 }
 
-.left_side{
+#left_side{
     
     height: 100%;
     width: 25%;
@@ -145,12 +145,14 @@ body{
     gap: 10px;
     width: 100%;
     padding-left: 10px;
+    color: rgba(240, 113, 113, 0.5);
 }
 
 .singleProject{
     padding-left: 10px;
-    border: 1px solid;
-    border-radius: 5px;
+    border: 0px;
+    border-radius: 10px;
+
     height: 40px;
     display: flex;
     align-items: center;
@@ -171,6 +173,7 @@ body{
     font-size: 24pt;
     color:#DC4C40;
     align-items: center;
+    cursor: pointer;
 }
 
 .addProjectButton{
