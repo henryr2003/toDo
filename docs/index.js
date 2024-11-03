@@ -9,6 +9,8 @@ const singleTask = {
     description: "",
     dueDate: "",
     priority: "",
+    titleLength: "",
+    descLength: "",
 }
 
 const singleProject = {
@@ -16,41 +18,6 @@ const singleProject = {
     projectList: [],
     color: "",
 }
-// class SingleTask{
-    
-//     constructor(title,description, dueDate, priority){
-//         this.title = title;
-//         this.description = description;
-//         this.dueDate = dueDate;
-//         this.priority = priority;
-
-//         this.bottomWidth = 0;
-//     }
-
-//     // logTaskInfo(){
-//     //     console.log(`Title: ${this.title} Description: ${this.description}
-//     //          Due Date: ${this.dueDate} Priority: ${this.priority}`)
-
-
-//     // }
-
-
-// }
-
-// class Project{
-//     constructor(){
-//         this.name = "Default Project"
-//         this.projectList = [];
-//         this.color = "blue";
-//     }
-
-//     getLength(){
-//         return this.projectList.length;
-//     }
-
-    
-
-// }
 
 let currentProjectIndex = 0;
 
@@ -94,23 +61,29 @@ rightContainer.appendChild(clearButton)
 
 
 
-function makeTextInput(title, index){
+function makeTextInput(task, index){
     const textInput = document.createElement("input");
     textInput.id = "textInput";
     textInput.type = "text";
-    textInput.value = title;
+    textInput.value = task.title;
     textInput.placeholder = "Type Task Here";
+    if(task.titleLength != ""){
+        textInput.style.width = task.titleLength;
+    }
 
     textInput.addEventListener("input", () => {
-        textInput.style.width = Math.min(textInput.scrollWidth, textInput.parentElement.parentElement.clientWidth - 100) + "px";
-        
+
+        const newLength = Math.min(textInput.scrollWidth, textInput.parentElement.parentElement.clientWidth - 100) + "px"
+        textInput.style.width = newLength;
+
+
         const globalProj = JSON.parse(localStorage.getItem("projects"));
 
         console.log(`index: ${index}`);
 
         console.log(`globalProj[currentProjectIndex]: ${globalProj[currentProjectIndex].projectList[index]}`)
         globalProj[currentProjectIndex].projectList[index].title = textInput.value;
-
+        globalProj[currentProjectIndex].projectList[index].titleLength = newLength;
         localStorage.setItem("projects", JSON.stringify(globalProj));
         
     })
@@ -118,16 +91,21 @@ function makeTextInput(title, index){
     return textInput;
 }
 
-function makeBottomTextInput(description, index){
+function makeBottomTextInput(task, index){
     const bottomTextInput = document.createElement("input");
     bottomTextInput.id = "bottomInput";
     bottomTextInput.type = "bottomText";
-    bottomTextInput.value = description;
+    bottomTextInput.value = task.description;
     bottomTextInput.placeholder = "Type Description Here";
 
+    if(task.descLength != ""){
+        bottomTextInput.style.width = task.descLength;
+    }
 
     bottomTextInput.addEventListener("input", () => {
-        bottomTextInput.style.width = Math.min(bottomTextInput.scrollWidth, bottomTextInput.parentElement.parentElement.clientWidth - 100) + "px";
+
+        const newLength = Math.min(bottomTextInput.scrollWidth, bottomTextInput.parentElement.parentElement.clientWidth - 100) + "px"
+        bottomTextInput.style.width = newLength;
         
         const globalProj = JSON.parse(localStorage.getItem("projects"));
 
@@ -135,6 +113,7 @@ function makeBottomTextInput(description, index){
 
         console.log(`globalProj[currentProjectIndex]: ${globalProj[currentProjectIndex].projectList[index]}`)
         globalProj[currentProjectIndex].projectList[index].description = bottomTextInput.value;
+        globalProj[currentProjectIndex].projectList[index].descLength = newLength;
 
         localStorage.setItem("projects", JSON.stringify(globalProj));
         
@@ -160,7 +139,7 @@ function makeSingleTask(task, container, index, project){
     textDiv.classList.add("textDiv");
 
 
-    const textInput = makeTextInput(task.title, index);
+    const textInput = makeTextInput(task, index);
 
     
     textDiv.appendChild(textInput)
@@ -190,7 +169,7 @@ function makeSingleTask(task, container, index, project){
         localStorage.setItem("projects", JSON.stringify([project]));
         console.log(`taskIndex: ${taskIndex}`);
 
-        setTimeout(() => deleteTaskDOM(container), 400);
+        setTimeout(() => deleteTaskDOM(container), 400); 
 
     })
 
@@ -200,8 +179,8 @@ function makeSingleTask(task, container, index, project){
             expandButton.src = chevDown;
             const bottomDiv = document.createElement("div");
             bottomDiv.setAttribute("id", "bottomDiv");
-            const bottomText = makeBottomTextInput(task.description, index);
-            
+            const bottomText = makeBottomTextInput(task, index);
+
             bottomText.addEventListener("input", () => {
                 const globalProj = JSON.parse(localStorage.getItem("projects"));
 
@@ -275,12 +254,12 @@ function makeProjectDOM(project,container){
     addTaskDiv.addEventListener("click", () => {
         let task = {...singleTask, title: "New Task"};
         project.projectList.push(task);
-        console.log(`eventProject length: ${project.projectList.length}`);
+        console.log(`project.projectList: ${project.projectList}`);
         let globalProj = JSON.parse(localStorage.getItem("projects"));
         globalProj[currentProjectIndex] = project; 
 
         localStorage.setItem("projects", JSON.stringify(globalProj));
-
+        
         const taskDiv = document.createElement("div");
         taskDiv.classList.add("taskDiv");
         makeSingleTask(task, taskDiv, project.projectList.length-1, project);
@@ -389,7 +368,7 @@ function makeAddProj(project){
     addProjectButton.textContent = "+";
     const addProjText = document.createElement("div");
     addProjText.textContent = "Add Project";
-    addProjectDiv.appendChild(addProjectButton);    
+    addProjectDiv.appendChild(addProjectButton);       
     addProjectDiv.appendChild(addProjText);    
 
     leftSide.appendChild(addProjectDiv);
