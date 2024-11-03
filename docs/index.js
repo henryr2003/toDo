@@ -1,7 +1,8 @@
 import "./styles.css"
 import chevUp from "./chevronUp.svg";
 import chevDown from "./chevronDown.svg";
-import listBox from "./list-box-outline.svg"
+import listBox from "./list-box-outline.svg";
+import editImg from "./edit.svg";
 import { format, addDays} from 'date-fns';
 
 const singleTask = {
@@ -49,15 +50,40 @@ else{
 
 
 
-const clearButton = document.createElement("button");
-clearButton.textContent = "clear";
+// const clearButton = document.createElement("button");
+// clearButton.textContent = "clear";
 
-clearButton.addEventListener("click", () => {
-    localStorage.clear();
-})
+const bodyGlobal = document.getElementById("body");
+
+function createPopUp(button){
+    button.addEventListener("click", () => {
+        const popUp = document.createElement("div");
+        const background = document.createElement("div");
+    
+        popUp.setAttribute("id", "popUp");
+        background.setAttribute("id", "shadowBackground");
+         
+        popUp.style.display = "flex";
+        background.style.display = "flex"
+        
+        const closeButton = document.createElement("button");
+        closeButton.textContent = "Close";
+    
+        popUp.appendChild(closeButton);
+        bodyGlobal.appendChild(background);
+        bodyGlobal.appendChild(popUp);
+        closeButton.addEventListener("click", () => {
+            popUp.remove();
+            background.remove();
+            
+        })
+        
+    })
+    
+}
 
 
-rightContainer.appendChild(clearButton)
+
 
 
 
@@ -305,24 +331,36 @@ function makeProjectList(projectGlobal){
     projectsDiv.classList.add("projectsDiv");
     projectsDiv.setAttribute("id", "projDiv" + index);
 
-    if(currentProjectIndex == 0 && index == 0){
-        projectsDiv.style.backgroundColor = "rgba(240, 113, 113, 0.5)";
-    }
+
 
     const singleProject = document.createElement("div");
-
+    const iconAndTextDiv = document.createElement("div");
+    iconAndTextDiv.classList.add("iconAndTextDiv");
     const projTextDiv = document.createElement("div");
-
+    
     const projImg = document.createElement("img");
+
 
     projImg.src = listBox;
 
     projTextDiv.textContent = project.name;
 
+    iconAndTextDiv.appendChild(projImg);
+    iconAndTextDiv.appendChild(projTextDiv);
+
     singleProject.classList.add("singleProject");
 
-    singleProject.appendChild(projImg);
-    singleProject.appendChild(projTextDiv);
+    singleProject.appendChild(iconAndTextDiv);
+    
+    if(currentProjectIndex == 0 && index == 0){
+        projectsDiv.style.backgroundColor = "rgba(240, 113, 113, 0.5)";
+        const editButton = document.createElement("img");
+        editButton.src = editImg;
+        editButton.classList.add("projEditButton");
+        createPopUp(editButton);
+    
+        singleProject.appendChild(editButton);
+    }
 
     projectsDiv.appendChild(singleProject);
     leftContainer.appendChild(projectsDiv);
@@ -335,11 +373,22 @@ function makeProjectList(projectGlobal){
             let oldIndex = currentProjectIndex;
             let oldDiv = document.getElementById(`projDiv${oldIndex}`);
             const newDiv = document.getElementById(`projDiv${index}`);
+            const existingEditButton = oldDiv.querySelector(".projEditButton");
 
+            if (existingEditButton) {
+                existingEditButton.remove();
+            }
             console.log(`oldIndex: ${oldIndex}`);
             console.log(`newIndex: ${index}`);
             oldDiv.style.backgroundColor = "transparent";
             newDiv.style.backgroundColor = "rgba(240, 113, 113, 0.5)";
+        
+            const editButton = document.createElement("img");
+            editButton.src = editImg;
+            editButton.classList.add("projEditButton");
+            createPopUp(editButton);
+        
+            singleProject.appendChild(editButton);
 
             rightContainer.replaceChildren();
 
@@ -374,7 +423,7 @@ function makeAddProj(project){
     leftSide.appendChild(addProjectDiv);
 
     addProjectDiv.addEventListener("click", () => {
-        const newProj ={...singleProject};
+        const newProj ={...singleProject, name: "New Project"};
 
         console.log(`newProj: ${newProj}`);
         
