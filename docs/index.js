@@ -19,14 +19,22 @@ const singleProject = {
     projectList: [],
     color: "",
 }
+let currentProjectIndex;
 
-let currentProjectIndex = 0;
+if(localStorage.getItem("currentProjectIndex")){
+    let currentProjectIndex = localStorage.getItem("currentProjectIndex");
+
+}
+
+else{
+    let currentProjectIndex = 0;
+}
 
 const leftContainer = document.getElementById("left_container");
 const rightContainer = document.getElementById("right_container");
 
 let bottomWidthList = [];
-
+console.log("first");
 if(localStorage.length <= 1){
     const project = newProject();
     const projectGlobal = [project];
@@ -45,7 +53,8 @@ else{
 
     console.log(`.title: ${projectGlobal}`);
     makeLeftDOM(leftContainer, projectGlobal);
-    makeProjectDOM(projectGlobal[0],rightContainer);
+    let currentProjectIndex = localStorage.getItem("currentProjectIndex");
+    makeProjectDOM(projectGlobal[currentProjectIndex],rightContainer);
 }
 
 
@@ -55,23 +64,93 @@ else{
 
 const bodyGlobal = document.getElementById("body");
 
-function createPopUp(button){
+function createPopUp(button, option){
     button.addEventListener("click", () => {
+        const projectGlobal = JSON.parse(localStorage.getItem("projects"));
         const popUp = document.createElement("div");
         const background = document.createElement("div");
-    
+        const currentProjectIndex = localStorage.getItem("currentProjectIndex");
         popUp.setAttribute("id", "popUp");
         background.setAttribute("id", "shadowBackground");
          
-        popUp.style.display = "flex";
+        popUp.style.display = "grid";
         background.style.display = "flex"
+        if(option == 1){
+            console.log("option 1");
+            
+            const inputDiv = document.createElement("div");
+            const nameDiv = document.createElement("div");
+            const colorDiv = document.createElement("div");
+            colorDiv.classList.add("colorDiv");
+            const colorInput = document.createElement("input");
+            colorInput.type = "color";
+            colorInput.id = "colorInput";
+           
+            
+            colorDiv.appendChild(colorInput);
+
+            nameDiv.classList.add("nameDiv");
+            nameDiv.textContent = "Name"
+            inputDiv.classList.add("inputDiv");
+            
+            const nameInput = document.createElement("input");
+            nameInput.id = "nameInput";
+            nameInput.value = projectGlobal[currentProjectIndex].name;
+
+            inputDiv.appendChild(nameDiv);
+            inputDiv.appendChild(nameInput);
         
+            popUp.appendChild(inputDiv);
+            popUp.appendChild(colorDiv);
+        }
+
+        const popButtonsDiv = document.createElement("div");
+        const saveButton = document.createElement("button");
         const closeButton = document.createElement("button");
+        saveButton.textContent = "Save";
         closeButton.textContent = "Close";
+        saveButton.classList.add("savePopUp");
+        closeButton.classList.add("closePopUp");
+        popButtonsDiv.classList.add("popButtonsDiv");
+        popButtonsDiv.appendChild(saveButton);
+        popButtonsDiv.appendChild(closeButton);
+        popUp.appendChild(popButtonsDiv);
     
-        popUp.appendChild(closeButton);
         bodyGlobal.appendChild(background);
         bodyGlobal.appendChild(popUp);
+
+        saveButton.addEventListener("click", () => {
+            const newColor = document.getElementById("colorInput");
+            if (newColor.value != projectGlobal[currentProjectIndex].color){
+                projectGlobal[currentProjectIndex].color = newColor.value;
+                localStorage.setItem("projects", JSON.stringify(projectGlobal));
+                
+
+                leftContainer.replaceChildren();
+                leftContainer.nextElementSibling.remove();
+                makeLeftDOM(leftContainer, JSON.parse(localStorage.getItem("projects")));
+                console.log(`color: ${newColor.value}`);
+            }
+
+            const nameInput = document.getElementById("nameInput")
+            if(nameInput.value != projectGlobal[currentProjectIndex].name){
+                projectGlobal[currentProjectIndex].name = nameInput.value;
+                localStorage.setItem("projects", JSON.stringify(projectGlobal));
+
+                leftContainer.replaceChildren();
+                leftContainer.nextElementSibling.remove();
+                makeLeftDOM(leftContainer, JSON.parse(localStorage.getItem("projects")));
+                rightContainer.replaceChildren();
+                makeProjectDOM(projectGlobal[currentProjectIndex], rightContainer);
+                
+
+            }
+
+            popUp.remove();
+            background.remove();
+
+        })
+
         closeButton.addEventListener("click", () => {
             popUp.remove();
             background.remove();
@@ -93,11 +172,13 @@ function makeTextInput(task, index){
     textInput.type = "text";
     textInput.value = task.title;
     textInput.placeholder = "Type Task Here";
+
     if(task.titleLength != ""){
         textInput.style.width = task.titleLength;
     }
 
     textInput.addEventListener("input", () => {
+        const currentProjectIndex = localStorage.getItem("currentProjectIndex");
 
         const newLength = Math.min(textInput.scrollWidth, textInput.parentElement.parentElement.clientWidth - 100) + "px"
         textInput.style.width = newLength;
@@ -129,7 +210,7 @@ function makeBottomTextInput(task, index){
     }
 
     bottomTextInput.addEventListener("input", () => {
-
+        const currentProjectIndex = localStorage.getItem("currentProjectIndex");
         const newLength = Math.min(bottomTextInput.scrollWidth, bottomTextInput.parentElement.parentElement.clientWidth - 100) + "px"
         bottomTextInput.style.width = newLength;
         
@@ -187,12 +268,16 @@ function makeSingleTask(task, container, index, project){
 
 
     button.addEventListener("click", () => {
+        const projectGlobal = JSON.parse(localStorage.getItem("projects"));
+        const currentProjectIndex = JSON.parse(localStorage.getItem("currentProjectIndex"));
         console.log(`newProject length: ${project.projectList.length}`);
         button.classList.toggle("taskButtonNormal");
         button.classList.toggle("taskButtonPressed");
         const taskIndex = button.getAttribute("id");
         project.projectList.splice(taskIndex, 1);
-        localStorage.setItem("projects", JSON.stringify([project]));
+        projectGlobal[currentProjectIndex] = project;
+
+        localStorage.setItem("projects", JSON.stringify(projectGlobal));
         console.log(`taskIndex: ${taskIndex}`);
 
         setTimeout(() => deleteTaskDOM(container), 400); 
@@ -201,6 +286,7 @@ function makeSingleTask(task, container, index, project){
 
 
     expandButton.addEventListener("click", () => {
+        const currentProjectIndex = localStorage.getItem("currentProjectIndex");
         if(up == true){
             expandButton.src = chevDown;
             const bottomDiv = document.createElement("div");
@@ -278,6 +364,7 @@ function makeProjectDOM(project,container){
     addTaskDiv.appendChild(buttonText);
 
     addTaskDiv.addEventListener("click", () => {
+        const currentProjectIndex = localStorage.getItem("currentProjectIndex");
         let task = {...singleTask, title: "New Task"};
         project.projectList.push(task);
         console.log(`project.projectList: ${project.projectList}`);
@@ -326,84 +413,92 @@ function makeLeftDOM(leftContainer, project){
 function makeProjectList(projectGlobal){
 
     for(let index = 0; index < projectGlobal.length; index++){
-    const project = projectGlobal[index];
-    const projectsDiv = document.createElement("div");
-    projectsDiv.classList.add("projectsDiv");
-    projectsDiv.setAttribute("id", "projDiv" + index);
+        const project = projectGlobal[index];
+        const projectsDiv = document.createElement("div");
+        projectsDiv.classList.add("projectsDiv");
+        projectsDiv.setAttribute("id", "projDiv" + index);
 
 
 
-    const singleProject = document.createElement("div");
-    const iconAndTextDiv = document.createElement("div");
-    iconAndTextDiv.classList.add("iconAndTextDiv");
-    const projTextDiv = document.createElement("div");
-    
-    const projImg = document.createElement("img");
-
-
-    projImg.src = listBox;
-
-    projTextDiv.textContent = project.name;
-
-    iconAndTextDiv.appendChild(projImg);
-    iconAndTextDiv.appendChild(projTextDiv);
-
-    singleProject.classList.add("singleProject");
-
-    singleProject.appendChild(iconAndTextDiv);
-    
-    if(currentProjectIndex == 0 && index == 0){
-        projectsDiv.style.backgroundColor = "rgba(240, 113, 113, 0.5)";
-        const editButton = document.createElement("img");
-        editButton.src = editImg;
-        editButton.classList.add("projEditButton");
-        createPopUp(editButton);
-    
-        singleProject.appendChild(editButton);
-    }
-
-    projectsDiv.appendChild(singleProject);
-    leftContainer.appendChild(projectsDiv);
-
-    projectsDiv.addEventListener("click", () => {
-        if(index != currentProjectIndex){
-
-            const newProjGlobal = JSON.parse(localStorage.getItem("projects"));
-            
-            let oldIndex = currentProjectIndex;
-            let oldDiv = document.getElementById(`projDiv${oldIndex}`);
-            const newDiv = document.getElementById(`projDiv${index}`);
-            const existingEditButton = oldDiv.querySelector(".projEditButton");
-
-            if (existingEditButton) {
-                existingEditButton.remove();
-            }
-            console.log(`oldIndex: ${oldIndex}`);
-            console.log(`newIndex: ${index}`);
-            oldDiv.style.backgroundColor = "transparent";
-            newDiv.style.backgroundColor = "rgba(240, 113, 113, 0.5)";
+        const singleProject = document.createElement("div");
+        const iconAndTextDiv = document.createElement("div");
+        iconAndTextDiv.classList.add("iconAndTextDiv");
+        const projTextDiv = document.createElement("div");
         
+        const projImg = document.createElement("img");
+        const projImgDiv = document.createElement("div");
+        projImgDiv.appendChild(projImg);
+        projImgDiv.setAttribute("id", `projImgDiv${index}`);
+        projImgDiv.classList.add("projImgDiv");
+        projImg.src = listBox;
+        const listBoxLink = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>list-box-outline</title><path d="M11 15H17V17H11V15M9 7H7V9H9V7M11 13H17V11H11V13M11 9H17V7H11V9M9 11H7V13H9V11M21 5V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H19C20.1 3 21 3.9 21 5M19 5H5V19H19V5M9 15H7V17H9V15Z" /></svg>`
+        const projImgDivW = document.getElementById(`projImgDiv${index}`)
+        if(projectGlobal[index].color != "" && projImgDiv){
+                projImgDiv.innerHTML = `<svg fill=${projectGlobal[index].color} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>list-box-outline</title><path d="M11 15H17V17H11V15M9 7H7V9H9V7M11 13H17V11H11V13M11 9H17V7H11V9M9 11H7V13H9V11M21 5V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3H19C20.1 3 21 3.9 21 5M19 5H5V19H19V5M9 15H7V17H9V15Z" /></svg>`
+                console.log("bruhhhh:");
+            
+        }
+        projTextDiv.textContent = project.name;
+        
+        iconAndTextDiv.appendChild(projImgDiv);
+        iconAndTextDiv.appendChild(projTextDiv);
+
+        singleProject.classList.add("singleProject");
+
+        singleProject.appendChild(iconAndTextDiv);
+        
+        if(JSON.parse(localStorage.getItem("currentProjectIndex")) == index){
+            projectsDiv.style.backgroundColor = "rgba(240, 113, 113, 0.5)";
             const editButton = document.createElement("img");
             editButton.src = editImg;
             editButton.classList.add("projEditButton");
-            createPopUp(editButton);
+            createPopUp(editButton, 1);
         
             singleProject.appendChild(editButton);
-
-            rightContainer.replaceChildren();
-
-            console.log(`project[index]: ${projectGlobal[index]}`);
-
-            makeProjectDOM(newProjGlobal[index],rightContainer);
-            currentProjectIndex = index;
-
         }
-    })
 
-}
+        projectsDiv.appendChild(singleProject);
+        leftContainer.appendChild(projectsDiv);
 
+        projectsDiv.addEventListener("click", () => {
+            const currentProjectIndex = localStorage.getItem("currentProjectIndex");
+            if(index != currentProjectIndex){
 
-    
+                const newProjGlobal = JSON.parse(localStorage.getItem("projects"));
+                
+                let oldIndex = currentProjectIndex;
+                let oldDiv = document.getElementById(`projDiv${oldIndex}`);
+                const newDiv = document.getElementById(`projDiv${index}`);
+                const existingEditButton = oldDiv.querySelector(".projEditButton");
+
+                if (existingEditButton) {
+                    existingEditButton.remove();
+                }
+                console.log(`oldIndex: ${oldIndex}`);
+                console.log(`newIndex: ${index}`);
+                oldDiv.style.backgroundColor = "transparent";
+                newDiv.style.backgroundColor = "rgba(240, 113, 113, 0.5)";
+            
+                const editButton = document.createElement("img");
+                editButton.src = editImg;
+                editButton.classList.add("projEditButton");
+                createPopUp(editButton, 1);
+            
+                singleProject.appendChild(editButton);
+
+                rightContainer.replaceChildren();
+
+                console.log(`project[index]: ${projectGlobal[index]}`);
+
+                makeProjectDOM(newProjGlobal[index],rightContainer);
+                
+                localStorage.setItem("currentProjectIndex", index);
+
+            }
+        })
+
+    }
+
 }
 
 function makeAddProj(project){
