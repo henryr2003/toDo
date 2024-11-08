@@ -3,6 +3,7 @@ import chevUp from "./chevronUp.svg";
 import chevDown from "./chevronDown.svg";
 import listBox from "./list-box-outline.svg";
 import editImg from "./edit.svg";
+import editTaskImg from "./pencil.svg";
 import { format, addDays} from 'date-fns';
 
 const singleTask = {
@@ -103,6 +104,60 @@ function createPopUp(button, option){
             popUp.appendChild(inputDiv);
             popUp.appendChild(colorDiv);
         }
+       else if(option == 2){
+            console.log("option 2");
+                
+            const selectDiv = document.createElement("div");
+            selectDiv.classList.add("selectDiv");
+
+            const dateDiv = document.createElement("div");
+            dateDiv.classList.add("dateDiv");
+
+            const dateText = document.createElement("h3");
+            dateText.textContent = "Date";
+
+            const selectText = document.createElement("h3");
+            selectText.textContent = "Priority";
+
+            
+
+            const dateInput = document.createElement("input");
+            dateInput.type = "date";
+            dateInput.id = "dateInput";
+
+            
+            const selectInput = document.createElement("select");
+            selectInput.id = "select";
+            
+
+            const selectionOptions = [
+                {value: "Low", text: "Low"},
+                {value: "Medium", text: "Medium"},
+                {value: "High", text: "High"},
+                
+            ]
+            
+            selectionOptions.forEach(optionData => {
+                const option = document.createElement("option");
+                option.value = optionData.value;
+                option.text = optionData.text;
+
+                selectInput.appendChild(option);
+            })
+
+            dateDiv.appendChild(dateInput);
+
+            
+    
+            dateDiv.appendChild(dateText);
+            dateDiv.appendChild(dateInput);
+            
+            selectDiv.appendChild(selectText);
+            selectDiv.appendChild(selectInput);
+            
+            popUp.appendChild(dateDiv);
+            popUp.appendChild(selectDiv);
+        }
 
         const popButtonsDiv = document.createElement("div");
         const saveButton = document.createElement("button");
@@ -120,31 +175,48 @@ function createPopUp(button, option){
         bodyGlobal.appendChild(popUp);
 
         saveButton.addEventListener("click", () => {
-            const newColor = document.getElementById("colorInput");
-            if (newColor.value != projectGlobal[currentProjectIndex].color){
-                projectGlobal[currentProjectIndex].color = newColor.value;
-                localStorage.setItem("projects", JSON.stringify(projectGlobal));
-                
 
-                leftContainer.replaceChildren();
-                leftContainer.nextElementSibling.remove();
-                makeLeftDOM(leftContainer, JSON.parse(localStorage.getItem("projects")));
-                console.log(`color: ${newColor.value}`);
+            if(option == 1){
+                const newColor = document.getElementById("colorInput");
+                if (newColor.value != projectGlobal[currentProjectIndex].color){
+                    projectGlobal[currentProjectIndex].color = newColor.value;
+                    localStorage.setItem("projects", JSON.stringify(projectGlobal));
+                    
+
+                    leftContainer.replaceChildren();
+                    leftContainer.nextElementSibling.remove();
+                    makeLeftDOM(leftContainer, JSON.parse(localStorage.getItem("projects")));
+                    console.log(`color: ${newColor.value}`);
+                }
+
+                const nameInput = document.getElementById("nameInput")
+                if(nameInput.value != projectGlobal[currentProjectIndex].name){
+                    projectGlobal[currentProjectIndex].name = nameInput.value;
+                    localStorage.setItem("projects", JSON.stringify(projectGlobal));
+
+                    leftContainer.replaceChildren();
+                    leftContainer.nextElementSibling.remove();
+                    makeLeftDOM(leftContainer, JSON.parse(localStorage.getItem("projects")));
+                    rightContainer.replaceChildren();
+                    makeProjectDOM(projectGlobal[currentProjectIndex], rightContainer);
+
+            }
             }
 
-            const nameInput = document.getElementById("nameInput")
-            if(nameInput.value != projectGlobal[currentProjectIndex].name){
-                projectGlobal[currentProjectIndex].name = nameInput.value;
-                localStorage.setItem("projects", JSON.stringify(projectGlobal));
+            else{
+                const dateInput = document.getElementById("dateInput");
+                const prioritySelection = document.getElementById("select");
+                
+                const currentTaskIndex = button.id;
 
-                leftContainer.replaceChildren();
-                leftContainer.nextElementSibling.remove();
-                makeLeftDOM(leftContainer, JSON.parse(localStorage.getItem("projects")));
+                projectGlobal[currentProjectIndex].projectList[currentTaskIndex].dueDate = dateInput.value;
+                projectGlobal[currentProjectIndex].projectList[currentTaskIndex].priority = prioritySelection.value;
+
+                localStorage.setItem("projects", JSON.stringify(projectGlobal));
                 rightContainer.replaceChildren();
                 makeProjectDOM(projectGlobal[currentProjectIndex], rightContainer);
-                
-
             }
+            
 
             popUp.remove();
             background.remove();
@@ -255,13 +327,44 @@ function makeSingleTask(task, container, index, project){
     expandButton.classList.add("expandButton");
     let up = true;
     expandButton.src = chevUp;
+    
+    const allText = document.createElement("div");
+    allText.classList.add("allText");
+    
 
     const buttonAndText = document.createElement("div");
     buttonAndText.classList.add("buttonAndText");
     buttonAndText.appendChild(button);
     buttonAndText.appendChild(textDiv);
 
-    topDiv.appendChild(buttonAndText);
+    const subText = document.createElement("div");
+    subText.classList.add("subText");
+
+    const dateText = document.createElement("div");
+    const priorityText = document.createElement("div");
+    
+    dateText.innerHTML = task.dueDate;
+    if(task.priority != ""){
+        priorityText.innerHTML = `${task.priority} Priority`;
+    }
+    
+
+    subText.appendChild(dateText);
+    subText.appendChild(priorityText);
+
+    const editTaskButton = document.createElement("img");
+    editTaskButton.src = editTaskImg;
+    editTaskButton.id =  index;
+    editTaskButton.classList.add("editTaskButton");
+
+    createPopUp(editTaskButton, 2);
+
+    allText.appendChild(buttonAndText);
+    allText.appendChild(subText);
+
+    topDiv.appendChild(allText);
+
+    topDiv.appendChild(editTaskButton);
     topDiv.appendChild(expandButton);
 
     container.appendChild(topDiv);
@@ -451,6 +554,7 @@ function makeProjectList(projectGlobal){
             projectsDiv.style.backgroundColor = "rgba(240, 113, 113, 0.5)";
             const editButton = document.createElement("img");
             editButton.src = editImg;
+            
             editButton.classList.add("projEditButton");
             createPopUp(editButton, 1);
         
@@ -482,6 +586,7 @@ function makeProjectList(projectGlobal){
                 const editButton = document.createElement("img");
                 editButton.src = editImg;
                 editButton.classList.add("projEditButton");
+                
                 createPopUp(editButton, 1);
             
                 singleProject.appendChild(editButton);
