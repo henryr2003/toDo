@@ -47,7 +47,9 @@ body{
     
 }
 
-
+.projEditButton{
+    margin-right: 10px;
+}
 .taskButtonNormal{
     border-radius: 50px;
     height: 25px;
@@ -225,7 +227,11 @@ body{
 }
 
 .popButtonsDiv{
-    grid-row: 4/5
+    grid-row: 4/5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 #shadowBackground{
@@ -266,4 +272,28 @@ body{
     gap: 50px;
     height: fit-content;
     padding-left: 45px;
+}
+
+.savePopUp{
+    width: 100px;
+    height: 50px;
+    cursor: pointer;
+
+    border: 0px;
+    background-color: #57a72c;
+}
+
+.closePopUp{
+    width: 50px;
+    height: 25px;
+    margin-top: 10px;
+    border: 0px;
+    background-color: #eba49e;
+    cursor: pointer;
+}
+.dateDiv, .selectDiv{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }

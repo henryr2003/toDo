@@ -343,14 +343,20 @@ function makeSingleTask(task, container, index, project){
     const dateText = document.createElement("div");
     const priorityText = document.createElement("div");
     
-    dateText.innerHTML = task.dueDate;
+    if(task.dueDate != ""){
+        dateText.innerHTML = task.dueDate;
+        subText.appendChild(dateText);
+
+    }
+    
     if(task.priority != ""){
         priorityText.innerHTML = `${task.priority} Priority`;
+        subText.appendChild(priorityText);
     }
     
 
-    subText.appendChild(dateText);
-    subText.appendChild(priorityText);
+    
+    
 
     const editTaskButton = document.createElement("img");
     editTaskButton.src = editTaskImg;
