@@ -89,11 +89,13 @@ function createPopUp(button, option){
             colorInput.type = "color";
             colorInput.id = "colorInput";
            
-            
+            const colorText = document.createElement("div");
+            colorText.innerHTML = "Color";
+            colorDiv.appendChild(colorText);
             colorDiv.appendChild(colorInput);
 
             nameDiv.classList.add("nameDiv");
-            nameDiv.textContent = "Name"
+            nameDiv.textContent = "Project Name"
             inputDiv.classList.add("inputDiv");
             
             const nameInput = document.createElement("input");
