@@ -39,6 +39,8 @@ console.log("first");
 if(localStorage.length <= 1){
     const project = newProject();
     const projectGlobal = [project];
+    localStorage.setItem("currentProjectIndex", JSON.stringify(0));
+    
     console.log(`secondpro length: ${project.projectList.length}`);
     localStorage.setItem("projects", JSON.stringify([project]));
     console.log(`projects first here: ${localStorage.getItem("projects")}`);
