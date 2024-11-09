@@ -41,7 +41,7 @@ if(localStorage.length <= 1){
     const projectGlobal = [project];
     localStorage.setItem("currentProjectIndex", JSON.stringify(0));
     
-    console.log(`secondpro length: ${project.projectList.length}`);
+    console.log(`changes check: ${project.projectList.length}`);
     localStorage.setItem("projects", JSON.stringify([project]));
     console.log(`projects first here: ${localStorage.getItem("projects")}`);
     makeLeftDOM(leftContainer, projectGlobal);
